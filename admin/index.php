@@ -29,4 +29,6 @@
 </div>
 
 <?php bca_render_table(); ?>
+
+<div id="bcaConvertEditor"></div>
 </div>
