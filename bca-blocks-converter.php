@@ -23,6 +23,7 @@ define('BCA_BLOCK_CONVERTER_URI', plugin_dir_url( __FILE__ ) );
 // post types and statuses plugin work with
 define( 'BCA_BLOCK_CONVERTER_TYPES', serialize( array( 'post' ) ) );
 define( 'BCA_BLOCK_CONVERTER_STATUSES', serialize( array( 'publish', 'future', 'draft', 'private' ) ) );
+define( 'BCA_BLOCK_CONVERTER_PER_PAGE', 2 );
 
 if ( ! function_exists( 'bca_register_block_converter_taxonomy' ) ) {
 
@@ -95,8 +96,8 @@ add_action( 'admin_menu', 'bca_add_block_converter_admin_page' );
  * Enqueue admin styles and scripts.
  */
 function bca_block_converter_enqueue_scripts() {
-
-	wp_register_script( 'bca-block-converter-script', BCA_BLOCK_CONVERTER_URI . 'admin/assets/convert.js', array( 'jquery', 'wp-blocks', 'wp-edit-post' ), false, true );
+	$asset = include_once BCA_BLOCK_CONVERTER_PATH . '/build/index.asset.php';
+	wp_register_script( 'bca-block-converter-script', BCA_BLOCK_CONVERTER_URI . 'build/index.js', array( 'jquery', 'wp-blocks', 'wp-edit-post' ), $asset['version'], true );
 	$jsObj = array(
 		'ajaxUrl'                      => admin_url( 'admin-ajax.php' ),
 		'serverErrorMessage'           => '<div class="error"><p>' . __( 'Server error occured!', 'bca' ) . '</p></div>',
@@ -262,7 +263,7 @@ function bca_scan_posts() {
 	$args = array(
 		'post_type'      => $post_types,
 		'post_status'    => array_keys(get_object_vars($post_statuses)),
-		'posts_per_page' => 10,
+		'posts_per_page' => BCA_BLOCK_CONVERTER_PER_PAGE,
 		'offset'         => $offset,
 	);
 	$posts_array = get_posts( $args );
@@ -328,7 +329,7 @@ function bca_convert_bulk( $data )
 		$args        = array(
 			'post_type'      => $post_types,
 			'post_status'    => $post_statuses,
-			'posts_per_page' => 10,
+			'posts_per_page' => BCA_BLOCK_CONVERTER_PER_PAGE,
 			'tax_query'		 => array(
 				array(
 					'taxonomy' => 'bca_blocks_converter',
